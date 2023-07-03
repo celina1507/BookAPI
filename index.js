@@ -131,4 +131,69 @@ bookAPI.get("/au/:isbn", (req, res) => {
   return res.json({ authors: getSpecificAuthors });
 });
 
+/*
+Route           /book/new
+Description     to add new book
+Access          public
+Parameters      NON
+Method          POST
+*/
+bookAPI.post("/book/new", (req,res) => {
+    const { newBook } = req.body;
+    database.books.push(newBook);
+    return res.json({books: database.books, message: "books was added"});
+});
+/* 
+Route           /author/new
+Description     to add new author
+Access          public
+Parameters      none
+Method          POST
+*/
+bookAPI.post("/author/new", (req,res) => {
+  const {newAuthor} = req.body;
+  database.authors.push(newAuthor);
+  return res.json({authors: database.authors, message: "author was added!!"});
+});
+
+/* 
+Route           /book/update
+Description     to update title of a book
+Access          public
+Parameters      isbn
+Method          PUT
+*/
+bookAPI.put("/book/update/:isbn" ,(req,res) => {
+  database.books.forEach((book) => {
+    if(book.ISBN === req.params.isbn){
+      book.title = req.body.bookTitle;
+      return;
+    }
+  });
+  return res.json({books: database.books});
+
+});
+/*
+Route           /author/update
+Description     to update author name
+Access          public
+Parameters      id
+Method          PUT
+*/
+bookAPI.put( "/book/author/update/:isbn" , (req,res) => {
+  // update book database 
+  database.books.forEach((book) => {
+    if(book.ISBN === req.params.isbn){
+      return book.authors.push(req.body.newAuthor);
+    }
+  });
+  //update author database
+  database.authors.forEach((author) => {
+    if(author.id === req.body.newAuthor){
+      return author.books.push(req.params.isbn);
+    }
+  })
+
+  return res.json({ books: database.books, authors: database.authors});
+})
 bookAPI.listen(3000, console.log("server running!!"));
