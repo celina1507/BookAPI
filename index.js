@@ -138,10 +138,10 @@ Access          public
 Parameters      NON
 Method          POST
 */
-bookAPI.post("/book/new", (req,res) => {
-    const { newBook } = req.body;
-    database.books.push(newBook);
-    return res.json({books: database.books, message: "books was added"});
+bookAPI.post("/book/new", (req, res) => {
+  const { newBook } = req.body;
+  database.books.push(newBook);
+  return res.json({ books: database.books, message: "books was added" });
 });
 /* 
 Route           /author/new
@@ -150,10 +150,10 @@ Access          public
 Parameters      none
 Method          POST
 */
-bookAPI.post("/author/new", (req,res) => {
-  const {newAuthor} = req.body;
+bookAPI.post("/author/new", (req, res) => {
+  const { newAuthor } = req.body;
   database.authors.push(newAuthor);
-  return res.json({authors: database.authors, message: "author was added!!"});
+  return res.json({ authors: database.authors, message: "author was added!!" });
 });
 
 /* 
@@ -163,15 +163,14 @@ Access          public
 Parameters      isbn
 Method          PUT
 */
-bookAPI.put("/book/update/:isbn" ,(req,res) => {
+bookAPI.put("/book/update/:isbn", (req, res) => {
   database.books.forEach((book) => {
-    if(book.ISBN === req.params.isbn){
+    if (book.ISBN === req.params.isbn) {
       book.title = req.body.bookTitle;
       return;
     }
   });
-  return res.json({books: database.books});
-
+  return res.json({ books: database.books });
 });
 /*
 Route           /author/update
@@ -180,20 +179,95 @@ Access          public
 Parameters      id
 Method          PUT
 */
-bookAPI.put( "/book/author/update/:isbn" , (req,res) => {
-  // update book database 
+bookAPI.put("/book/author/update/:isbn", (req, res) => {
+  // update book database
   database.books.forEach((book) => {
-    if(book.ISBN === req.params.isbn){
+    if (book.ISBN === req.params.isbn) {
       return book.authors.push(req.body.newAuthor);
     }
   });
   //update author database
   database.authors.forEach((author) => {
-    if(author.id === req.body.newAuthor){
+    if (author.id === req.body.newAuthor) {
       return author.books.push(req.params.isbn);
     }
-  })
+  });
 
-  return res.json({ books: database.books, authors: database.authors});
+  return res.json({ books: database.books, authors: database.authors });
+});
+
+/*
+Route           /book/delete
+Description     to delete a book
+Access          public
+Parameters      isbn
+Method          DELETE
+*/
+
+bookAPI.delete("/book/delete/:isbn", (req, res) => {
+  const updatedBookDatabase = database.books.filter(
+    (book) => book.ISBN !== req.params.isbn
+  );
+  database.books = updatedBookDatabase;
+  database.authors.forEach((author) => {
+    const newBooks = author.books.filter((book) => book !== req.params.isbn);
+    author.books = newBooks;
+  });
+  return res.json({ books: database.books, authors: database.authors });
+});
+
+/*
+Route           /book/delete/author
+Description     to delete author from a book
+Access          public
+Parameters      isbn, authid
+Method          DELETE
+*/
+bookAPI.delete("/book/delete/author/:isbn/:authId", (req, res) => {
+  //update book database
+  database.books.forEach((book) => {
+    if (book.ISBN === req.params.isbn) {
+      const newAuthors = book.authors.filter(
+        (author) => author !== parseInt(req.params.authId)
+      );
+      book.authors = newAuthors;
+      return; // no need to check for other functions
+    }
+  });
+  //update author database
+  database.authors.forEach((author) => {
+    const newBooks = author.books.filter((book) => book !== req.params.isbn);
+    author.books = newBooks;
+  });
+  return res.json({ books: database.books, authors: database.authors });
+});
+
+/*
+Route           /publication/delete/book
+Description     to delete book from a publication
+Access          public
+Parameters      isbn, pubId
+Method          DELETE
+*/
+
+bookAPI.delete("/publication/delete/book/:isbn/:pubId", (req, res) => {
+  //update publication database
+  database.publications.forEach((publication) => {
+    if(publication.id === parseInt(req.params.pubId)){
+      const newPubBooks = publication.books.filter((book) => book !== req.params.isbn)
+      publication.books = newPubBooks;
+      return;
+    }
+  });
+  
+  //update book database
+  database.books.forEach((book) => {
+    if(book.ISBN === req.params.isbn){
+      book.publication = 0;
+      return;
+    }
+  });
+  return res.json({books: database.books, publications: database.publications});
 })
+
 bookAPI.listen(3000, console.log("server running!!"));
