@@ -5,6 +5,11 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 
+//models 
+const BookModels = require("./database/book");
+const AuthorModels = require("./database/author");
+const PublicationModels = require("./database/publication");
+
 //database
 const database = require("./database/index");
 
