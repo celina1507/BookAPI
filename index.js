@@ -1,5 +1,9 @@
+//
+require("dotenv").config();
+
 //framework
 const express = require("express");
+const mongoose = require("mongoose");
 
 //database
 const database = require("./database/index");
@@ -9,6 +13,11 @@ const bookAPI = express();
 
 //configurations
 bookAPI.use(express.json());
+
+//establish database connection
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => console.log("Connection Established"));
 
 /* 
 Route           /
@@ -253,21 +262,26 @@ Method          DELETE
 bookAPI.delete("/publication/delete/book/:isbn/:pubId", (req, res) => {
   //update publication database
   database.publications.forEach((publication) => {
-    if(publication.id === parseInt(req.params.pubId)){
-      const newPubBooks = publication.books.filter((book) => book !== req.params.isbn)
+    if (publication.id === parseInt(req.params.pubId)) {
+      const newPubBooks = publication.books.filter(
+        (book) => book !== req.params.isbn
+      );
       publication.books = newPubBooks;
       return;
     }
   });
-  
+
   //update book database
   database.books.forEach((book) => {
-    if(book.ISBN === req.params.isbn){
+    if (book.ISBN === req.params.isbn) {
       book.publication = 0;
       return;
     }
   });
-  return res.json({books: database.books, publications: database.publications});
-})
+  return res.json({
+    books: database.books,
+    publications: database.publications,
+  });
+});
 
 bookAPI.listen(3000, console.log("server running!!"));
