@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
-const PublicationsSchema = mongoose.Schema({
+const PublicationSchema = mongoose.Schema({
     id: Number,
     name: String,
     books: [String],
 });
 
-const PublicationModel = moongoose.model("publications", PublicationsSchema);
+const PublicationModel = mongoose.model("publications", PublicationSchema);
 
-module.exposts = PublicationModel;
+module.exports = PublicationModel;
