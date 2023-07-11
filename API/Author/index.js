@@ -82,9 +82,35 @@ Router.get("/au/:isbn", async (req, res) => {
   Method          POST
   */
 Router.post("/new", async (req, res) => {
-  const { newAuthor } = req.body;
-  AuthorModel.create(newAuthor);
-  return res.json({ message: "author was added!!" });
+  try {
+    const { newAuthor } = req.body;
+    await AuthorModel.create(newAuthor);
+    return res.json({ message: "author was added!!" });
+  } catch (error) {
+    return res.json({message: error.message});
+  }
+});
+
+/*
+  Route           /author/delete
+  Description     to delete author
+  Access          public
+  Parameters      id
+  Method          DELETE 
+  */
+Router.delete("/delete/:id", async (req, res) => {
+  const deletedAuthor = await AuthorModel.findOneAndDelete(
+    {
+      id: parseInt(req.params.id),
+    },
+    {
+      new: true,
+    }
+  );
+  return res.json({
+    deletedAuthor: deletedAuthor,
+    message: "author was added!!",
+  });
 });
 
 module.exports = Router;

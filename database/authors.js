@@ -1,9 +1,18 @@
 const mongoose = require("mongoose");
 
 const AuthorSchema = mongoose.Schema({
-    id: Number,
-    name: String,
-    books: [String],
+    id:{
+        type: Number,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true,
+    },
+    books: {
+        type: [String],
+        required: true,
+    },
 });
 
 const AuthorModel = mongoose.model("authors", AuthorSchema);

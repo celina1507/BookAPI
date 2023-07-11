@@ -26,12 +26,16 @@ Router.get("/", async (req, res) => {
   Method          get
   */
 Router.get("/is/:ISBN", async (req, res) => {
-  const getSpecificBook = await BookModel.findOne({ ISBN: req.params.ISBN });
-  // NULL if no match is found
-  if (!getSpecificBook) {
-    return res.json({
-      error: `No book found for ISBN of ${req.params.ISBN}`,
-    });
+  try {
+    const getSpecificBook = await BookModel.findOne({ ISBN: req.params.ISBN });
+    // NULL if no match is found
+    if (!getSpecificBook) {
+      return res.json({
+        error: `No book found for ISBN of ${req.params.ISBN}`,
+      });
+    }
+  } catch (error) {
+    return res.json({ error: error.message });
   }
   return res.json(getSpecificBook);
 });
@@ -57,7 +61,6 @@ Router.get("/c/:category", async (req, res) => {
   }
   return res.json(getSpecificBooks);
 });
-
 
 /*
 Route           /book/new
